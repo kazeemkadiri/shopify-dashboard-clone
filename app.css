@@ -70,6 +70,7 @@ a{
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.5rem;
 }
 
 .logo__container{
@@ -244,12 +245,6 @@ a{
     padding: 0.1875rem;
 }
 
-.notifications__list--icons svg:hover,
-.notifications__list--icons svg:focus{
-    border: 1px solid var(--site-element-focused);
-    border-radius: 4px;
-}
-
 .notifications__list--body{
     display: flex;
     padding: 1rem;
@@ -298,7 +293,17 @@ a{
     border-radius: 0.5rem;
 }
 
+.notifications__list--icons svg:hover{
+    background-color: transparent;
+    border: none;
+}
+
+.notifications__list--icons svg:hover,
+.notifications__list--icons svg:focus,
+.logo__container:focus,
+.info__container--x-icon:focus,
 .menu--item:focus,
+#setup__guide--right--container:focus,
 .profile__menu--menu--item:active, 
 .profile__menu--menu--items li:active,
 .profile__menu--menu--item:focus,
@@ -309,6 +314,7 @@ a{
     border-radius: 0.5rem;
     position: relative;
     outline: 2px solid var(--site-element-focused);
+    outline-offset: 2px;
     background-color: transparent;
 }
 
@@ -483,7 +489,7 @@ hr{
 
 .info__container--call-to-action:focus{
     outline: 2px solid #005BD3;
-    outline-offset: 4px;
+    outline-offset: 2px;
 }
 
 .info__container--x-icon{
@@ -701,7 +707,7 @@ hr{
 
 .outline-blue{
     outline: 2px solid #005BD3;
-    outline-offset: 4px;
+    outline-offset: 2px;
 }
 
 .list__container--call--to--action .btn:hover{
@@ -725,7 +731,7 @@ hr{
     border-left: 1px solid rgba(255, 255, 255, 0.20);
     background-color: #404040;
     outline: 2px solid #005BD3;
-    outline-offset: 4px;
+    outline-offset: 2px;
 }
 
 .list__container--call--to--action *{
@@ -748,9 +754,21 @@ hr{
 
 .list__container--item button:focus{
     outline: 2px solid var(--site-element-focused);
-    outline-offset: 4px;
+    outline-offset: 2px;
     border-radius: 4px;
 }
+
+.dashed-circle-icon{
+    stroke-dasharray: 8 8;
+}
+
+.sr-only {
+    position: absolute;
+    left:-99999px;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+  }
 
 @keyframes spinLoadingIcon{
     from{
@@ -865,11 +883,10 @@ hr{
     }
 
     .setup__guide--right--container{
-        padding-right: 1rem;
-        padding-top: 1rem;
+        margin: 0.5rem 0.5rem 0 0;
         display: flex;
-        align-items: start;
-        height: 100%;
+        align-self: flex-start;
+        height: auto;
         background-color: transparent;
         border: none;
         outline: 0px;

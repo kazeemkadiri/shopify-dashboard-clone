@@ -101,9 +101,12 @@ window.onload = () => {
   const setupGuideArrowContainer = document.querySelector(
     ".setup__guide--right--container"
   );
+
   const setupGuideArrowDown =
     setupGuideArrowContainer.querySelector(".dropdown-arrow");
+
   const setupGuideArrowUp = setupGuideArrowContainer.querySelector(".up-arrow");
+
   const listContainer = document.querySelector(
     ".setup__guide--container .list__container"
   );
@@ -116,30 +119,93 @@ window.onload = () => {
     ".list__container--operation--title button"
   );
 
+  const menuProps = {
+    clickCount: 0,
+    openMenus: [],
+  };
+
+  function nodePath(targetElement) {
+    if (
+      targetElement.classList.contains("profile__menu") ||
+      targetElement.classList.contains("notifications__list")
+    ) {
+      return true;
+    } else {
+      if (!targetElement.parentNode.parentNode) return false;
+
+      return nodePath(targetElement.parentNode);
+    }
+  }
+
+  const handleWindowClicked = (menu) => {
+    const hideMenuHandler = (event) => {
+      if (menuProps.clickCount === 1) {
+        menuProps.clickCount = 2;
+        return;
+      }
+
+      const menuPathFound = nodePath(event.target);
+
+      if (!menuPathFound) {
+        menu.classList.add(HIDDEN_CLASS);
+        menuProps.clickCount = 0;
+        window.removeEventListener("click", hideMenuHandler);
+      }
+    };
+
+    if (menuProps.clickCount === 1) {
+      // Close the menu if the user clicks outside of it
+      window.addEventListener("click", hideMenuHandler);
+    }
+  };
+
   const toggleDisplayNotifications = (e) => {
+    menuProps.clickCount += 1;
+
     toggleDisplayMenu(notificationBell, notificationsList);
   };
 
   const toggleDisplayProfileMenu = (e) => {
+    menuProps.clickCount += 1;
+
     toggleDisplayMenu(notificationProfileBtn, notificationProfileMenu);
   };
 
+  const hideOpenMenus = () => {
+    if (menuProps.openMenus.length === 0) return;
+    menuProps.openMenus.forEach((menu) => menu.classList.add(HIDDEN_CLASS));
+    menuProps.openMenus = [];
+  };
+
   const toggleDisplayMenu = (btn, menu) => {
+    // if (menuProps.openMenus.length === 0) return;
+    // menuProps.openMenus.forEach((menu) => menu.classList.add(HIDDEN_CLASS));
+    for (let x = 0; x < menuProps.openMenus.length; x++) {
+      menuProps.openMenus[x].classList.add(HIDDEN_CLASS);
+    }
+
+    menuProps.openMenus = [];
+
     // Toggle the focused state of the clicked button
     btn.classList.toggle("active");
 
     // Toggle the hidden state of the menu box
-    menu.classList.toggle("hidden");
+    menu.classList.remove(HIDDEN_CLASS);
+
+    // Save the open menu
+    menuProps.openMenus.push(menu);
+
+    if (menuProps.clickCount === 1) handleWindowClicked(menu);
   };
 
   const hideInfoContainer = () =>
-    document.querySelector(".info__container").classList.add("hidden");
+    document.querySelector(".info__container").classList.add(HIDDEN_CLASS);
 
   const hideInfoContainerUsingKeyboard = (event) => {
     event.preventDefault();
 
     // when the Enter key (13) is pressed, trigger a button click
-    if (event.keyCode === 13) {
+    if (event.keyCode === 13 || event.keyCode === 32) {
       document
         .querySelector(`#${event.target.id}`)
         .dispatchEvent(new Event("click"));
@@ -206,6 +272,9 @@ window.onload = () => {
   };
 
   const changeCircle = (container, selectedStep) => {
+    // Get current setup guide description
+    const menuItemHeaderText = container.nextElementSibling.textContent;
+
     // if dashed circle icon is visible,
     if (!getDashedCircleIcon(container).classList.contains(HIDDEN_CLASS)) {
       hideDashedCircle(container);
@@ -217,6 +286,11 @@ window.onload = () => {
       setTimeout(() => {
         hideLoadingIcon(container);
         showCompletedCircle(container);
+
+        // Change aria label value of current menuitem
+        container.querySelector(
+          ".sr-only"
+        ).innerHTML = `Marked ${menuItemHeaderText} as completed`;
       }, 1000);
     } else {
       // if completed circle icon is visible
@@ -231,6 +305,11 @@ window.onload = () => {
       setTimeout(() => {
         hideLoadingIcon(container);
         showDashedCircle(container);
+
+        // Change aria label value of current menuitem
+        container.querySelector(
+          ".sr-only"
+        ).innerHTML = `Marked ${menuItemHeaderText} as incomplete`;
       }, 1000);
     }
   };
@@ -255,7 +334,7 @@ window.onload = () => {
     accordionContainer.classList.add("active");
 
     // Display the image of the list item (accordion)
-    accordionContainer.querySelector("img").classList.remove("hidden");
+    accordionContainer.querySelector("img").classList.remove(HIDDEN_CLASS);
   };
 
   const setCurrentActiveStep = (step) => {
